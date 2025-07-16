@@ -1,3 +1,4 @@
+import time
 from flask import Flask, render_template, request, redirect, url_for, session
 import requests
 import os
@@ -78,10 +79,20 @@ def delete_price():
             result = {"error": str(e)}
     return render_template('delete_price.html', result=result)
 
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('login'))
+
+@app.route('/slow-endpoint')
+def slow_endpoint():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    try:
+        response = requests.get(f"{BACKEND_API_BASE}/api/slow-endpoint")
+        result = response.json()
+    except Exception as e:
+        result = {"error": str(e)}
+
+    return result
+
 
 if __name__ == '__main__':
     app.run(debug=True)
